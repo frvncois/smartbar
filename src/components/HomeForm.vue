@@ -1,11 +1,41 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
+import { ref } from 'vue'
 
 const router = useRouter()
+const isSubmitting = ref(false)
 
 const handleSubmit = (event: Event) => {
   event.preventDefault()
-  router.push('/confirm')
+
+  const form = event.target as HTMLFormElement
+  const checkbox = form.querySelector('input[type="checkbox"]') as HTMLInputElement
+
+  // Validate 21+ checkbox
+  if (!checkbox.checked) {
+    alert('Please confirm you are 21+')
+    return
+  }
+
+  // Prevent double submission
+  if (isSubmitting.value) return
+  isSubmitting.value = true
+
+  // Create hidden iframe for submission
+  const iframe = document.createElement('iframe')
+  iframe.name = 'hidden-mailchimp-iframe'
+  iframe.style.display = 'none'
+  document.body.appendChild(iframe)
+
+  // Submit to Mailchimp via iframe
+  form.target = 'hidden-mailchimp-iframe'
+  form.submit()
+
+  // Wait briefly then redirect
+  setTimeout(() => {
+    document.body.removeChild(iframe)
+    router.push('/confirm')
+  }, 1000)
 }
 </script>
 
@@ -25,13 +55,19 @@ const handleSubmit = (event: Event) => {
                 </div>
             </li>
             <li>
-                <form @submit="handleSubmit">
-                    <input type="text" placeholder="First Name" />
-                    <input type="text" placeholder="Last Name" />
-                    <input type="email" placeholder="Email address" />
-                    <label>I confirm I am 21+<input type="checkbox" /></label>
-                    <input type="number" placeholder="Number of guests" />
-                    <input type="text" placeholder="Mailing address (optional — occasionally used for fun'merch shipments)" />
+                <form
+                    action="https://flyjinmtl.us21.list-manage.com/subscribe/post?u=5c39ede37fffc5e36224f6c6e&id=e4bc816560&f_id=00708de6f0"
+                    method="post"
+                    @submit="handleSubmit"
+                >
+                    <input type="text" name="FNAME" placeholder="First Name" required />
+                    <input type="text" name="LNAME" placeholder="Last Name" required />
+                    <input type="email" name="EMAIL" placeholder="Email address" required />
+                    <label>I confirm I am 21+<input type="checkbox" required /></label>
+                    <input type="number" name="MMERGE5" placeholder="Number of guests" required />
+                    <input type="text" name="MMERGE6" placeholder="Mailing address (optional — occasionally used for fun'merch shipments)" />
+                    <!-- Honeypot field for spam protection -->
+                    <input type="text" name="b_5c39ede37fffc5e36224f6c6e_e4bc816560" tabindex="-1" value="" style="position: absolute; left: -5000px;" aria-hidden="true" />
                     <button type="submit">Submit rsvp</button>
                 </form>
             </li>
