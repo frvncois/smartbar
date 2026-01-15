@@ -1,7 +1,7 @@
 <template>
     <section>
-        <img src="@/assets/banner.gif" alt="Banner" class="banner-desktop" />
-        <img src="@/assets/banner-mobile.gif" alt="Banner" class="banner-mobile" />
+        <video src="@/assets/desktop.mp4" class="banner-desktop" autoplay loop muted playsinline></video>
+        <video src="@/assets/mobile.mp4" class="banner-mobile" autoplay loop muted playsinline></video>
     </section>
 </template>
 
@@ -12,7 +12,7 @@
         align-items: center;
         overflow: hidden;
     }
-    img {
+    video {
         width: calc(100% + 4px);
         height: auto;
         margin-left: -2px;
